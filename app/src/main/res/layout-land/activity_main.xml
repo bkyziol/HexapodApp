@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.bkyziol.hexapodapp.MainActivity">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/keys_background"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/buttonsMapView"
+        android:scaleType="fitCenter"
+        android:translationZ="1dp"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@android:color/black"
+        android:id="@+id/backgroundView"
+        android:translationZ="2dp"
+        />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@android:color/black"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/cameraView"
+        android:translationZ="3dp"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/keys_sleep_mode"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/menuView"
+        android:translationZ="4dp"
+        android:scaleType="fitCenter" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:color/transparent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/pressedButton1View"
+        android:translationZ="5dp"
+        android:scaleType="fitCenter" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:color/transparent"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/pressedButton2View"
+        android:translationZ="5dp"
+        android:scaleType="fitCenter" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/speed_slow"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/speedView"
+        android:translationZ="5dp"
+        android:scaleType="fitCenter" />
+
+    <ImageView
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:src="@drawable/screen"
+        android:id="@+id/screenView"
+        android:translationZ="5dp"
+        android:layout_marginLeft="2dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="2dp" />
+
+    <TextView
+        android:text="Serwer: OFF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="17dp"
+        android:layout_marginStart="17dp"
+        android:id="@+id/serverStatusTextView"
+        android:layout_alignTop="@+id/screenView"
+        android:layout_alignLeft="@+id/screenView"
+        android:layout_alignStart="@+id/screenView"
+        android:translationZ="5dp"
+        android:textColor="@color/red" />
+
+    <TextView
+        android:text="Haxapod: OFF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/serverStatusTextView"
+        android:layout_alignLeft="@+id/serverStatusTextView"
+        android:layout_alignStart="@+id/serverStatusTextView"
+        android:id="@+id/hexapodStatusTextView"
+        android:translationZ="5dp"
+        android:textColor="@color/red" />
+
+    <TextView
+        android:text="Kamera: OFF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/hexapodStatusTextView"
+        android:layout_alignLeft="@+id/hexapodStatusTextView"
+        android:layout_alignStart="@+id/hexapodStatusTextView"
+        android:id="@+id/cameraStatusTextView"
+        android:translationZ="5dp"
+        android:textColor="@color/red" />
+
+</RelativeLayout>
