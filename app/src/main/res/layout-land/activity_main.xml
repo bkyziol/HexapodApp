@@ -5,16 +5,16 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bkyziol.hexapodapp.MainActivity">
+    tools:context="com.bkyziol.hexapod.activity.MainActivity">
 
     <ImageView
+        android:id="@+id/buttonsMapView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/keys_background"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:id="@+id/buttonsMapView"
         android:scaleType="fitCenter"
+        android:src="@drawable/keys_background"
         android:translationZ="1dp"
         android:visibility="invisible" />
 

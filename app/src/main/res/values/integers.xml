@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="max_speed">395</integer>
+    <integer name="max_camera_speed">195</integer>
+    <integer name="max_stride_length">100</integer>
+    <integer name="max_video_quality">99</integer>
+    <integer name="max_video_FPS">9</integer>
+    <integer name="port_number">1234</integer>
+    <integer name="camera_port_number">2345</integer>
+</resources>
