@@ -3,17 +3,25 @@ package com.bkyziol.hexapod.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.bkyziol.hexapod.R;
+import com.bkyziol.hexapod.image.ImageData;
+import com.bkyziol.hexapod.image.ImageObserver;
 import com.bkyziol.hexapod.mqtt.HexapodConnection;
 import com.bkyziol.hexapod.status.DeviceStatus;
 
-public class MainActivity extends Activity {
+import java.io.UnsupportedEncodingException;
+
+public class MainActivity extends Activity implements ImageObserver {
 
     private HexapodConnection hexapodConnection;
     private DeviceStatus deviceStatus;
@@ -22,25 +30,34 @@ public class MainActivity extends Activity {
     private ImageView menuView;
     private ImageView pressedButton1View;
     private ImageView pressedButton2View;
+    private ImageView cameraImageView;
+
+    private Handler imageHandler;
 
     private int hexapodPointerIndex = -1;
     private int cameraPointerIndex = -1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        hexapodConnection = new HexapodConnection(this);
-        deviceStatus = new DeviceStatus();
+        this.hexapodConnection = new HexapodConnection(this);
+        this.deviceStatus = new DeviceStatus();
 
+        this.buttonsMapView = findViewById(R.id.buttonsMapView);
+        this.menuView = findViewById(R.id.menuView);
+        this.pressedButton1View = findViewById(R.id.pressedButton1View);
+        this.pressedButton2View = findViewById(R.id.pressedButton2View);
+        this.cameraImageView = findViewById(R.id.cameraView);
+        ImageData.register(this);
 
-        buttonsMapView = findViewById(R.id.buttonsMapView);
-        menuView = findViewById(R.id.menuView);
-        pressedButton1View = findViewById(R.id.pressedButton1View);
-        pressedButton2View = findViewById(R.id.pressedButton2View);
-
+        this.imageHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                ImageData.setImageData((byte[]) msg.obj);
+            }
+        };
 
         menuView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -162,6 +179,17 @@ public class MainActivity extends Activity {
                     speedView.setImageResource(R.drawable.speed_fast);
                 }
                 break;
+            case 0Xeaff00:
+//                ImageView cameraEnabledView = findViewById(R.id.speedView);
+                if (deviceStatus.isCameraEnabled()) {
+                    deviceStatus.setCameraEnabled(false);
+                    cameraImageView.setImageResource(R.color.black);
+//                    speedView.setImageResource(R.drawable.speed_slow);
+                } else {
+                    deviceStatus.setCameraEnabled(true);
+//                    speedView.setImageResource(R.drawable.speed_fast);
+                }
+                break;
             case 0Xffba00:
                 pressedButton1View.setImageResource(R.drawable.settings);
                 openMenuSettings();
@@ -194,11 +222,11 @@ public class MainActivity extends Activity {
                     deviceStatus.setCameraMovement("CAMERA_DOWN");
                     pressedButton2View.setImageResource(R.drawable.camera_down);
                     break;
-                case 0Xeaff00:
+//                case 0Xeaff00:
 //                    hexapodPointerIndex = pointerIndex;
 //                    deviceStatus.setCameraMovement("LOOKLEFT");
 //                    pressedButton1View.setImageResource(R.drawable.camera_left);
-                    break;
+//                    break;
                 case 0Xa200ff:
 //                    hexapodPointerIndex = pointerIndex;
 //                    deviceStatus.setCameraMovement("LOOKRIGHT");
@@ -232,7 +260,20 @@ public class MainActivity extends Activity {
     }
 
     private void openMenuSettings() {
-        Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
-        MainActivity.this.startActivity(myIntent);
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+        MainActivity.this.startActivity(intent);
+    }
+
+    public Handler getImageHandler() {
+        return imageHandler;
+    }
+
+    @Override
+    public void update(byte[] data) {
+        if (cameraImageView.getHeight() != 0 && cameraImageView.getWidth() != 0) {
+            Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+            Bitmap scaledBmp = Bitmap.createScaledBitmap(bmp, cameraImageView.getWidth(), cameraImageView.getHeight(), false);
+            cameraImageView.setImageBitmap(scaledBmp);
+        }
     }
 }

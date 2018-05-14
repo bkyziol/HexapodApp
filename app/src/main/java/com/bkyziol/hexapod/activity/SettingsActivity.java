@@ -1,6 +1,8 @@
 package com.bkyziol.hexapod.activity;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -8,48 +10,50 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.bkyziol.hexapod.R;
+import com.bkyziol.hexapod.image.ImageData;
+import com.bkyziol.hexapod.image.ImageObserver;
 import com.bkyziol.hexapod.status.DeviceStatus;
 
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends Activity implements ImageObserver {
 
-    private static ImageView cameraView;
+    private ImageView cameraImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        cameraView = findViewById(R.id.cameraView);
+        cameraImageView = findViewById(R.id.cameraViewSettings);
 
         final SeekBar speedSlowBar;
         speedSlowBar = findViewById(R.id.speedSlowBar);
         speedSlowBar.setMax(getResources().getInteger(R.integer.max_speed));
-        speedSlowBar.setProgress(DeviceStatus.getSpeedSlow());
+        speedSlowBar.setProgress(DeviceStatus.getSpeedSlow() - 5);
 
         final SeekBar speedFastBar;
         speedFastBar = findViewById(R.id.speedFastBar);
         speedFastBar.setMax(getResources().getInteger(R.integer.max_speed));
-        speedFastBar.setProgress(DeviceStatus.getSpeedFast());
+        speedFastBar.setProgress(DeviceStatus.getSpeedFast() - 5);
 
         SeekBar strideLengthBar;
         strideLengthBar = findViewById(R.id.strideLengthBar);
         strideLengthBar.setMax(getResources().getInteger(R.integer.max_stride_length));
-        strideLengthBar.setProgress(DeviceStatus.getStrideLength());
+        strideLengthBar.setProgress(DeviceStatus.getStrideLength() - 10);
 
         SeekBar cameraSpeedBar;
         cameraSpeedBar = findViewById(R.id.cameraSpeedBar);
         cameraSpeedBar.setMax(getResources().getInteger(R.integer.max_camera_speed));
-        cameraSpeedBar.setProgress(DeviceStatus.getCameraSpeed());
+        cameraSpeedBar.setProgress(DeviceStatus.getCameraSpeed() - 5);
 
         SeekBar videoFPSBar;
         videoFPSBar = findViewById(R.id.videoFPSBar);
         videoFPSBar.setMax(getResources().getInteger(R.integer.max_video_FPS));
-        videoFPSBar.setProgress(DeviceStatus.getVideoFPS());
+        videoFPSBar.setProgress(DeviceStatus.getVideoFPS() - 1);
 
         SeekBar videoQualityBar;
         videoQualityBar = findViewById(R.id.videoQualityBar);
         videoQualityBar.setMax(getResources().getInteger(R.integer.max_video_quality));
-        videoQualityBar.setProgress(DeviceStatus.getVideoQuality());
+        videoQualityBar.setProgress(DeviceStatus.getVideoQuality() - 1);
 
         speedSlowBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -188,5 +192,26 @@ public class SettingsActivity extends Activity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void update(byte[] data) {
+        if (cameraImageView != null && cameraImageView.getHeight() != 0 && cameraImageView.getWidth() != 0) {
+            Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+            Bitmap scaledBmp = Bitmap.createScaledBitmap(bmp, cameraImageView.getWidth(), cameraImageView.getHeight(), false);
+            cameraImageView.setImageBitmap(scaledBmp);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ImageData.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ImageData.unregister(this);
     }
 }

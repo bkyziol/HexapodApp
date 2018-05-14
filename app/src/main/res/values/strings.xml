@@ -4,5 +4,6 @@
     <string name="cognito_pool_id">eu-west-1:5b9f1d9c-95c3-4a77-8431-5187c64742fe</string>
     <string name="camera_topic">hexapod/camera</string>
     <string name="status_topic">hexapod/status</string>
+    <string name="ping_topic">hexapod/ping</string>
     <string name="command_topic">hexapod/command</string>
 </resources>

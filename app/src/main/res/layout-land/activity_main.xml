@@ -102,7 +102,7 @@
         android:textColor="@color/red" />
 
     <TextView
-        android:text="Haxapod: OFF"
+        android:text="Haxapod: unknown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/serverStatusTextView"
@@ -110,17 +110,6 @@
         android:layout_alignStart="@+id/serverStatusTextView"
         android:id="@+id/hexapodStatusTextView"
         android:translationZ="5dp"
-        android:textColor="@color/red" />
-
-    <TextView
-        android:text="Kamera: OFF"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/hexapodStatusTextView"
-        android:layout_alignLeft="@+id/hexapodStatusTextView"
-        android:layout_alignStart="@+id/hexapodStatusTextView"
-        android:id="@+id/cameraStatusTextView"
-        android:translationZ="5dp"
-        android:textColor="@color/red" />
+        android:textColor="@color/yellow" />
 
 </RelativeLayout>

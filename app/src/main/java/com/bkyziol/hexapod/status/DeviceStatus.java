@@ -9,13 +9,14 @@ public class DeviceStatus {
     private static String cameraMovement = "STAND_BY";
     private static boolean sleepMode = true;
     private static boolean fastMode = false;
-    private static Boolean speedLevelFast = false;
     private static int speedFast = 100;
     private static int speedSlow = 20;
     private static int strideLength = 70;
     private static int cameraSpeed = 100;
-    private static int videoQuality = 100;
-    private static int videoFPS = 10;
+
+    private static boolean cameraEnabled = true;
+    private static int videoQuality = 3;
+    private static int videoFPS = 4;
 
     public static String getHexapodMovement() {
         return hexapodMovement;
@@ -47,14 +48,6 @@ public class DeviceStatus {
 
     public static void setFastMode(boolean fastMode) {
         DeviceStatus.fastMode = fastMode;
-    }
-
-    public static Boolean getSpeedLevelFast() {
-        return speedLevelFast;
-    }
-
-    public static void setSpeedLevelFast(Boolean speedLevelFast) {
-        DeviceStatus.speedLevelFast = speedLevelFast;
     }
 
     public static int getSpeedFast() {
@@ -89,6 +82,15 @@ public class DeviceStatus {
         DeviceStatus.cameraSpeed = cameraSpeed;
     }
 
+
+    public static boolean isCameraEnabled() {
+        return cameraEnabled;
+    }
+
+    public static void setCameraEnabled(boolean cameraEnabled) {
+        DeviceStatus.cameraEnabled = cameraEnabled;
+    }
+
     public static int getVideoQuality() {
         return videoQuality;
     }
@@ -108,12 +110,18 @@ public class DeviceStatus {
     public static String toJSON() {
         JSONObject jsonObject = new JSONObject();
         try {
+            jsonObject.put("timestamp", System.currentTimeMillis());
             jsonObject.put("hexapodMovement", getHexapodMovement());
             jsonObject.put("cameraMovement", getCameraMovement());
             jsonObject.put("sleepMode", isSleepMode());
             jsonObject.put("fastMode", isFastMode());
-            jsonObject.put("timestamp", System.currentTimeMillis());
-
+            jsonObject.put("speedFast", getSpeedFast());
+            jsonObject.put("speedSlow", getSpeedSlow());
+            jsonObject.put("strideLength", getStrideLength());
+            jsonObject.put("cameraSpeed", getCameraSpeed());
+            jsonObject.put("cameraEnabled", isCameraEnabled());
+            jsonObject.put("videoQuality", getVideoQuality());
+            jsonObject.put("videoFPS", getVideoFPS());
             return jsonObject.toString();
         } catch (JSONException e) {
             // TODO Auto-generated catch block
