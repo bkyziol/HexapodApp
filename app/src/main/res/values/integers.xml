@@ -3,7 +3,7 @@
     <integer name="max_speed">395</integer>
     <integer name="max_camera_speed">195</integer>
     <integer name="max_stride_length">100</integer>
-    <integer name="max_video_quality">4</integer>
+    <integer name="max_video_quality">3</integer>
     <integer name="max_video_FPS">4</integer>
     <integer name="port_number">1234</integer>
     <integer name="camera_port_number">2345</integer>

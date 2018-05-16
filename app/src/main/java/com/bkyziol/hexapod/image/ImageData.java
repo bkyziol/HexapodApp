@@ -23,7 +23,7 @@ public class ImageData {
 
     public static void notifyObserver() {
         for (ImageObserver imageObserver : imageObservers) {
-            imageObserver.update(imageData);
+            imageObserver.updateCameraImageView(imageData);
         }
     }
 }

@@ -3,7 +3,6 @@ package com.bkyziol.hexapod.mqtt;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Message;
-import android.widget.TextView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttClientStatusCallback;
@@ -23,22 +22,22 @@ import java.util.UUID;
 public final class HexapodConnection {
 
     private final MainActivity activity;
+    private final Context context;
     private final Resources resources;
-    private final TextView serverStatusTextView;
-    private final TextView hexapodStatusTextView;
 
     private AWSIotMqttManager mqttManager;
 
-    private long lastStatusMessageTimestamp;
+    private long statusRequestTimestamp = 0;
+    private long statusResponseExpirationTimestamp = System.currentTimeMillis();
     private boolean connectedToServer = false;
 
     public HexapodConnection(final MainActivity activity) {
         this.activity = activity;
-        this.serverStatusTextView = activity.findViewById(R.id.serverStatusTextView);
-        this.hexapodStatusTextView = activity.findViewById(R.id.hexapodStatusTextView);
-
-        Context context = activity.getApplicationContext();
+        this.context = activity.getApplicationContext();
         this.resources = context.getResources();
+    }
+
+    public void connect() {
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
                 context,
                 resources.getString(R.string.cognito_pool_id),
@@ -55,8 +54,7 @@ public final class HexapodConnection {
         mqttManager.setOfflinePublishQueueEnabled(false);
         mqttManager.setReconnectRetryLimits(5, 5);
         mqttManager.setMaxAutoReconnectAttepts(-1);
-//        startSendCommandsInterval();
-        startSendStatusPingInterval();
+        startSendCommandsInterval();
         try {
             mqttManager.connect(credentialsProvider, new AWSIotMqttClientStatusCallback() {
                 @Override
@@ -64,28 +62,28 @@ public final class HexapodConnection {
                                             final Throwable throwable) {
                     connectedToServer = false;
                     if (throwable != null) {
-                        setServerStatusTextView(R.color.red, "Server: connection error");
+                        activity.setServerStatusTextView(R.color.red, "Server: connection error");
                     } else {
                         if (status == AWSIotMqttClientStatus.Connecting) {
-                            setServerStatusTextView(R.color.yellow, "Server: connecting...");
+                            activity.setServerStatusTextView(R.color.yellow, "Server: connecting...");
                         } else if (status == AWSIotMqttClientStatus.Connected) {
-                            setServerStatusTextView(R.color.green, "Server: connected");
+                            activity.setServerStatusTextView(R.color.green, "Server: connected");
                             connectedToServer = true;
                             subscribeToStatusTopic();
                             subscribeToCameraTopic();
                         } else if (status == AWSIotMqttClientStatus.Reconnecting) {
-                            setServerStatusTextView(R.color.yellow, "Server: reconnecting...");
+                            activity.setServerStatusTextView(R.color.yellow, "Server: reconnecting...");
                         } else {
-                            setServerStatusTextView(R.color.red, "Server: disconnected");
+                            activity.setServerStatusTextView(R.color.red, "Server: disconnected");
                         }
                     }
                     if (!connectedToServer) {
-                        setHexapodStatusTextView(R.color.yellow, "Hexapod: unknown");
+                        activity.setHexapodStatusTextView(R.color.yellow, "Hexapod: unknown");
                     }
                 }
             });
         } catch (final Exception e) {
-            setServerStatusTextView(R.color.red, "Server: connection error");
+            activity.setServerStatusTextView(R.color.red, "Server: connection error");
         }
     }
 
@@ -103,7 +101,7 @@ public final class HexapodConnection {
                         }
                     });
         } catch (Exception e) {
-            setServerStatusTextView(R.color.red, "Server: subscription error");
+            activity.setServerStatusTextView(R.color.red, "Server: subscription error");
         }
     }
 
@@ -116,26 +114,34 @@ public final class HexapodConnection {
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    lastStatusMessageTimestamp = System.currentTimeMillis();
+                                    statusResponseExpirationTimestamp = System.currentTimeMillis() + 5000;
                                     try {
                                         String string = new String(data, "UTF-8");
                                         switch (string) {
                                             case "OK":
-                                                setHexapodStatusTextView(R.color.green, "Hexapod: connected");
+                                                activity.setHexapodStatusTextView(R.color.green, "Hexapod: connected");
                                                 break;
                                             case "ERROR":
-                                                setHexapodStatusTextView(R.color.red, "Hexapod: ERROR");
+                                                activity.setHexapodStatusTextView(R.color.red, "Hexapod: ERROR");
+                                                break;
+                                            case "STANDING":
+                                                DeviceStatus.setSleepMode(false);
+                                                activity.showFullKeyboard();
+                                                break;
+                                            case "CROUCHING":
+                                                DeviceStatus.setSleepMode(true);
+                                                activity.showSleepModeKeyboard();
                                                 break;
                                         }
                                     } catch (UnsupportedEncodingException e) {
-                                        setHexapodStatusTextView(R.color.red, "Hexapod: ERROR");
+                                        activity.setHexapodStatusTextView(R.color.red, "Hexapod: ERROR");
                                     }
                                 }
                             });
                         }
                     });
         } catch (Exception e) {
-            setServerStatusTextView(R.color.red, "Server: subscription error");
+            activity.setServerStatusTextView(R.color.red, "Server: subscription error");
         }
     }
 
@@ -145,52 +151,24 @@ public final class HexapodConnection {
             @Override
             public void run() {
                 try {
-                    String jsonMessage = DeviceStatus.toJSON();
-                    mqttManager.publishString(jsonMessage, resources.getString(R.string.command_topic), AWSIotMqttQos.QOS0);
+                    if (connectedToServer && statusResponseExpirationTimestamp < System.currentTimeMillis()) {
+                        System.out.println("offline");
+                        activity.setHexapodStatusTextView(R.color.red, "Hexapod: offline");
+                    }
+                    if (statusRequestTimestamp + 3000  < System.currentTimeMillis()) {
+                        DeviceStatus.setStatusReportNeeded(true);
+                        statusRequestTimestamp = System.currentTimeMillis();
+                    }
+                    if (DeviceStatus.isHexapodMoving() || DeviceStatus.isCameraMoving() || DeviceStatus.isStatusReportNeeded()) {
+                        System.out.println("command send");
+                        String jsonMessage = DeviceStatus.commandJSON();
+                        mqttManager.publishString(jsonMessage, resources.getString(R.string.command_topic), AWSIotMqttQos.QOS0);
+                    }
                 } catch (Exception e) {
-                    setServerStatusTextView(R.color.red, "Server: disconnected");
-                    setHexapodStatusTextView(R.color.yellow, "Hexapod: unknown");
+                    activity.setServerStatusTextView(R.color.red, "Server: disconnected");
+                    activity.setHexapodStatusTextView(R.color.yellow, "Hexapod: unknown");
                 }
             }
         }, 0, 500);
-    }
-
-
-    private void startSendStatusPingInterval() {
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    if (connectedToServer && lastStatusMessageTimestamp + 4000 < System.currentTimeMillis()) {
-                        setHexapodStatusTextView(R.color.red, "Hexapod: offline");
-                    }
-                    mqttManager.publishString("PING", resources.getString(R.string.ping_topic), AWSIotMqttQos.QOS0);
-                } catch (Exception e) {
-                    setServerStatusTextView(R.color.red, "Server: disconnected");
-                    setHexapodStatusTextView(R.color.yellow, "Hexapod: unknown");
-                }
-            }
-        }, 0, 3000);
-    }
-
-    private void setServerStatusTextView(final int color, final String text) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                serverStatusTextView.setText(text);
-                serverStatusTextView.setTextColor(resources.getColor(color));
-            }
-        });
-    }
-
-    private void setHexapodStatusTextView(final int color, final String text) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                hexapodStatusTextView.setText(text);
-                hexapodStatusTextView.setTextColor(resources.getColor(color));
-            }
-        });
     }
 }

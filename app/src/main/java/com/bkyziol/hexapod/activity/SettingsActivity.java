@@ -195,7 +195,7 @@ public class SettingsActivity extends Activity implements ImageObserver {
     }
 
     @Override
-    public void update(byte[] data) {
+    public void updateCameraImageView(byte[] data) {
         if (cameraImageView != null && cameraImageView.getHeight() != 0 && cameraImageView.getWidth() != 0) {
             Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
             Bitmap scaledBmp = Bitmap.createScaledBitmap(bmp, cameraImageView.getWidth(), cameraImageView.getHeight(), false);

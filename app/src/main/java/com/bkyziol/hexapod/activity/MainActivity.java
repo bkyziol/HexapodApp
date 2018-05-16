@@ -8,10 +8,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bkyziol.hexapod.R;
 import com.bkyziol.hexapod.image.ImageData;
@@ -19,18 +19,18 @@ import com.bkyziol.hexapod.image.ImageObserver;
 import com.bkyziol.hexapod.mqtt.HexapodConnection;
 import com.bkyziol.hexapod.status.DeviceStatus;
 
-import java.io.UnsupportedEncodingException;
-
 public class MainActivity extends Activity implements ImageObserver {
 
     private HexapodConnection hexapodConnection;
-    private DeviceStatus deviceStatus;
 
     private ImageView buttonsMapView;
     private ImageView menuView;
     private ImageView pressedButton1View;
     private ImageView pressedButton2View;
     private ImageView cameraImageView;
+
+    private TextView serverStatusTextView;
+    private TextView hexapodStatusTextView;
 
     private Handler imageHandler;
 
@@ -43,13 +43,17 @@ public class MainActivity extends Activity implements ImageObserver {
         setContentView(R.layout.activity_main);
 
         this.hexapodConnection = new HexapodConnection(this);
-        this.deviceStatus = new DeviceStatus();
+        hexapodConnection.connect();
 
         this.buttonsMapView = findViewById(R.id.buttonsMapView);
         this.menuView = findViewById(R.id.menuView);
         this.pressedButton1View = findViewById(R.id.pressedButton1View);
         this.pressedButton2View = findViewById(R.id.pressedButton2View);
         this.cameraImageView = findViewById(R.id.cameraView);
+
+        this.serverStatusTextView = findViewById(R.id.serverStatusTextView);
+        this.hexapodStatusTextView = findViewById(R.id.hexapodStatusTextView);
+
         ImageData.register(this);
 
         this.imageHandler = new Handler() {
@@ -98,96 +102,111 @@ public class MainActivity extends Activity implements ImageObserver {
         int greenValue = Color.green(pixel);
         int blueValue = Color.blue(pixel);
         int pixelRGBValue = redValue * 65536 + greenValue * 256 + blueValue;
-
-        if (deviceStatus.getHexapodMovement().equals("STAND_BY") && !deviceStatus.isSleepMode()) {
+        if (DeviceStatus.getHexapodMovement().equals("STAND_BY") && !DeviceStatus.isSleepMode()) {
             switch (pixelRGBValue) {
                 case 0X43009e:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("FORWARD");
+                    DeviceStatus.setHexapodMovement("FORWARD");
                     break;
                 case 0X044c18:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("HARD_LEFT");
+                    DeviceStatus.setHexapodMovement("HARD_LEFT");
                     break;
                 case 0Xc0cfff:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("LEFT");
+                    DeviceStatus.setHexapodMovement("LEFT");
                     break;
                 case 0Xa6911d:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("SLIGHTLY_LEFT");
+                    DeviceStatus.setHexapodMovement("SLIGHTLY_LEFT");
                     break;
                 case 0X8a7b73:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("SLIGHTLY_RIGHT");
+                    DeviceStatus.setHexapodMovement("SLIGHTLY_RIGHT");
                     break;
                 case 0Xfc29dc:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("RIGHT");
+                    DeviceStatus.setHexapodMovement("RIGHT");
                     break;
                 case 0Xe4cfc5:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("HARD_RIGHT");
+                    DeviceStatus.setHexapodMovement("HARD_RIGHT");
                     break;
                 case 0Xca0000:
                     pressedButton1View.setImageResource(R.drawable.turn_left);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("TURN_LEFT");
+                    DeviceStatus.setHexapodMovement("TURN_LEFT");
                     break;
                 case 0Xc3006e:
                     pressedButton1View.setImageResource(R.drawable.turn_right);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("TURN_RIGHT");
+                    DeviceStatus.setHexapodMovement("TURN_RIGHT");
                     break;
                 case 0X01a7a9:
                     pressedButton1View.setImageResource(R.drawable.backward);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("BACKWARD");
+                    DeviceStatus.setHexapodMovement("BACKWARD");
                     break;
                 case 0X00ff2a:
                     pressedButton1View.setImageResource(R.drawable.strafe_left);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("STRAFE_LEFT");
+                    DeviceStatus.setHexapodMovement("STRAFE_LEFT");
                     break;
                 case 0Xac5d00:
                     pressedButton1View.setImageResource(R.drawable.strafe_right);
                     hexapodPointerIndex = pointerIndex;
-                    deviceStatus.setHexapodMovement("STRAFE_RIGHT");
+                    DeviceStatus.setHexapodMovement("STRAFE_RIGHT");
                     break;
             }
         }
-        if (deviceStatus.getHexapodMovement().equals("STAND_BY") && pixelRGBValue == 0X6c0000) {
+        if (DeviceStatus.getHexapodMovement().equals("STAND_BY") && pixelRGBValue == 0X6c0000) {
+            if (DeviceStatus.isSleepMode()) {
+                DeviceStatus.setHexapodMovement("RISE");
+            } else {
+                DeviceStatus.setHexapodMovement("CROUCH");
+            }
             hexapodPointerIndex = pointerIndex;
-            deviceStatus.setHexapodMovement("CROUCH");
             pressedButton1View.setImageResource(R.drawable.crouch);
         }
         switch (pixelRGBValue) {
             case 0Xa2b000:
                 ImageView speedView = findViewById(R.id.speedView);
-                if (deviceStatus.isFastMode()) {
-                    deviceStatus.setFastMode(false);
+                if (DeviceStatus.isFastMode()) {
+                    DeviceStatus.setFastMode(false);
                     speedView.setImageResource(R.drawable.speed_slow);
                 } else {
-                    deviceStatus.setFastMode(true);
+                    DeviceStatus.setFastMode(true);
                     speedView.setImageResource(R.drawable.speed_fast);
                 }
                 break;
             case 0Xeaff00:
-//                ImageView cameraEnabledView = findViewById(R.id.speedView);
-                if (deviceStatus.isCameraEnabled()) {
-                    deviceStatus.setCameraEnabled(false);
-                    cameraImageView.setImageResource(R.color.black);
-//                    speedView.setImageResource(R.drawable.speed_slow);
+                ImageView cameraEnabledView = findViewById(R.id.cameraEnabled);
+                if (!DeviceStatus.isCameraEnabled()) {
+                    System.out.println("Camera: enabled");
+                    DeviceStatus.setCameraEnabled(true);
+                    cameraEnabledView.setImageResource(R.drawable.camera_enabled);
                 } else {
-                    deviceStatus.setCameraEnabled(true);
-//                    speedView.setImageResource(R.drawable.speed_fast);
+                    System.out.println("Camera: disabled");
+                    DeviceStatus.setCameraEnabled(false);
+                    cameraImageView.setImageResource(R.color.black);
+                    cameraEnabledView.setImageResource(0);
+                }
+                break;
+            case 0Xa200ff:
+                ImageView faceDetectionEnabled = findViewById(R.id.faceDetectionEnabled);
+                if (!DeviceStatus.isFaceDetectionEnabled()) {
+                    DeviceStatus.setFaceDetectionEnabled(true);
+                    faceDetectionEnabled.setImageResource(R.drawable.face_detection_enabled);
+                } else {
+                    DeviceStatus.setFaceDetectionEnabled(false);
+                    faceDetectionEnabled.setImageResource(0);
                 }
                 break;
             case 0Xffba00:
@@ -195,42 +214,32 @@ public class MainActivity extends Activity implements ImageObserver {
                 openMenuSettings();
                 break;
         }
-        if (deviceStatus.getCameraMovement().equals("STAND_BY")) {
+        if (DeviceStatus.getCameraMovement().equals("STAND_BY")) {
             switch (pixelRGBValue) {
                 case 0Xff0090:
                     cameraPointerIndex = pointerIndex;
-                    deviceStatus.setCameraMovement("CAMERA_UP");
+                    DeviceStatus.setCameraMovement("CAMERA_UP");
                     pressedButton2View.setImageResource(R.drawable.camera_up);
                     break;
                 case 0X6c00ff:
                     cameraPointerIndex = pointerIndex;
-                    deviceStatus.setCameraMovement("CAMERA_LEFT");
+                    DeviceStatus.setCameraMovement("CAMERA_LEFT");
                     pressedButton2View.setImageResource(R.drawable.camera_left);
                     break;
                 case 0X00fdff:
                     cameraPointerIndex = pointerIndex;
-                    deviceStatus.setCameraMovement("CAMERA_RIGHT");
+                    DeviceStatus.setCameraMovement("CAMERA_RIGHT");
                     pressedButton2View.setImageResource(R.drawable.camera_right);
                     break;
                 case 0Xff0000:
                     cameraPointerIndex = pointerIndex;
-                    deviceStatus.setCameraMovement("CAMERA_CENTER");
+                    DeviceStatus.setCameraMovement("CAMERA_CENTER");
                     pressedButton2View.setImageResource(R.drawable.camera_center);
                     break;
                 case 0Xd1ab7d:
                     cameraPointerIndex = pointerIndex;
-                    deviceStatus.setCameraMovement("CAMERA_DOWN");
+                    DeviceStatus.setCameraMovement("CAMERA_DOWN");
                     pressedButton2View.setImageResource(R.drawable.camera_down);
-                    break;
-//                case 0Xeaff00:
-//                    hexapodPointerIndex = pointerIndex;
-//                    deviceStatus.setCameraMovement("LOOKLEFT");
-//                    pressedButton1View.setImageResource(R.drawable.camera_left);
-//                    break;
-                case 0Xa200ff:
-//                    hexapodPointerIndex = pointerIndex;
-//                    deviceStatus.setCameraMovement("LOOKRIGHT");
-//                    pressedButton1View.setImageResource(R.drawable.camera_right);
                     break;
             }
         }
@@ -240,12 +249,12 @@ public class MainActivity extends Activity implements ImageObserver {
         int pointerIndex = event.getActionIndex();
         if (pointerIndex == hexapodPointerIndex) {
             pressedButton1View.setImageResource(0x00000000);
-            deviceStatus.setHexapodMovement("STAND_BY");
+            DeviceStatus.setHexapodMovement("STAND_BY");
             hexapodPointerIndex = -1;
         }
         if (pointerIndex == cameraPointerIndex) {
             pressedButton2View.setImageResource(0x00000000);
-            deviceStatus.setCameraMovement("STAND_BY");
+            DeviceStatus.setCameraMovement("STAND_BY");
             cameraPointerIndex = -1;
         }
     }
@@ -253,8 +262,8 @@ public class MainActivity extends Activity implements ImageObserver {
     private void allButtonsReleased() {
         pressedButton1View.setImageResource(0x00000000);
         pressedButton2View.setImageResource(0x00000000);
-        deviceStatus.setHexapodMovement("STAND_BY");
-        deviceStatus.setCameraMovement("STAND_BY");
+        DeviceStatus.setHexapodMovement("STAND_BY");
+        DeviceStatus.setCameraMovement("STAND_BY");
         hexapodPointerIndex = -1;
         cameraPointerIndex = -1;
     }
@@ -269,11 +278,50 @@ public class MainActivity extends Activity implements ImageObserver {
     }
 
     @Override
-    public void update(byte[] data) {
+    public void updateCameraImageView(byte[] data) {
         if (cameraImageView.getHeight() != 0 && cameraImageView.getWidth() != 0) {
             Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
             Bitmap scaledBmp = Bitmap.createScaledBitmap(bmp, cameraImageView.getWidth(), cameraImageView.getHeight(), false);
             cameraImageView.setImageBitmap(scaledBmp);
         }
     }
+
+    public void showFullKeyboard() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                menuView.setImageResource(R.drawable.keys);
+            }
+        });
+    }
+
+    public void showSleepModeKeyboard() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                menuView.setImageResource(R.drawable.keys_sleep_mode);
+            }
+        });
+    }
+
+    public void setServerStatusTextView(final int color, final String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                serverStatusTextView.setText(text);
+                serverStatusTextView.setTextColor(getApplicationContext().getResources().getColor(color));
+            }
+        });
+    }
+
+    public void setHexapodStatusTextView(final int color, final String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                hexapodStatusTextView.setText(text);
+                hexapodStatusTextView.setTextColor(getApplicationContext().getResources().getColor(color));
+            }
+        });
+    }
+
 }
