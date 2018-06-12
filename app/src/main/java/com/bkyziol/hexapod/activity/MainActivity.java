@@ -102,75 +102,75 @@ public class MainActivity extends Activity implements ImageObserver {
         int greenValue = Color.green(pixel);
         int blueValue = Color.blue(pixel);
         int pixelRGBValue = redValue * 65536 + greenValue * 256 + blueValue;
-        if (DeviceStatus.getHexapodMovement().equals("STAND_BY") && !DeviceStatus.isSleepMode()) {
+        if (DeviceStatus.getBodyMovement().equals("STAND_BY") && !DeviceStatus.isSleepMode()) {
             switch (pixelRGBValue) {
                 case 0X43009e:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("FORWARD");
+                    DeviceStatus.setBodyMovement("FORWARD");
                     break;
                 case 0X044c18:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("HARD_LEFT");
+                    DeviceStatus.setBodyMovement("HARD_LEFT");
                     break;
                 case 0Xc0cfff:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("LEFT");
+                    DeviceStatus.setBodyMovement("LEFT");
                     break;
                 case 0Xa6911d:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("SLIGHTLY_LEFT");
+                    DeviceStatus.setBodyMovement("SLIGHTLY_LEFT");
                     break;
                 case 0X8a7b73:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("SLIGHTLY_RIGHT");
+                    DeviceStatus.setBodyMovement("SLIGHTLY_RIGHT");
                     break;
                 case 0Xfc29dc:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("RIGHT");
+                    DeviceStatus.setBodyMovement("RIGHT");
                     break;
                 case 0Xe4cfc5:
                     pressedButton1View.setImageResource(R.drawable.forward);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("HARD_RIGHT");
+                    DeviceStatus.setBodyMovement("HARD_RIGHT");
                     break;
                 case 0Xca0000:
                     pressedButton1View.setImageResource(R.drawable.turn_left);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("TURN_LEFT");
+                    DeviceStatus.setBodyMovement("TURN_LEFT");
                     break;
                 case 0Xc3006e:
                     pressedButton1View.setImageResource(R.drawable.turn_right);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("TURN_RIGHT");
+                    DeviceStatus.setBodyMovement("TURN_RIGHT");
                     break;
                 case 0X01a7a9:
                     pressedButton1View.setImageResource(R.drawable.backward);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("BACKWARD");
+                    DeviceStatus.setBodyMovement("BACKWARD");
                     break;
                 case 0X00ff2a:
                     pressedButton1View.setImageResource(R.drawable.strafe_left);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("STRAFE_LEFT");
+                    DeviceStatus.setBodyMovement("STRAFE_LEFT");
                     break;
                 case 0Xac5d00:
                     pressedButton1View.setImageResource(R.drawable.strafe_right);
                     hexapodPointerIndex = pointerIndex;
-                    DeviceStatus.setHexapodMovement("STRAFE_RIGHT");
+                    DeviceStatus.setBodyMovement("STRAFE_RIGHT");
                     break;
             }
         }
-        if (DeviceStatus.getHexapodMovement().equals("STAND_BY") && pixelRGBValue == 0X6c0000) {
+        if (DeviceStatus.getBodyMovement().equals("STAND_BY") && pixelRGBValue == 0X6c0000) {
             if (DeviceStatus.isSleepMode()) {
-                DeviceStatus.setHexapodMovement("RISE");
+                DeviceStatus.setBodyMovement("RISE");
             } else {
-                DeviceStatus.setHexapodMovement("CROUCH");
+                DeviceStatus.setBodyMovement("CROUCH");
             }
             hexapodPointerIndex = pointerIndex;
             pressedButton1View.setImageResource(R.drawable.crouch);
@@ -214,31 +214,31 @@ public class MainActivity extends Activity implements ImageObserver {
                 openMenuSettings();
                 break;
         }
-        if (DeviceStatus.getCameraMovement().equals("STAND_BY")) {
+        if (DeviceStatus.getHeadMovement().equals("STAND_BY")) {
             switch (pixelRGBValue) {
                 case 0Xff0090:
                     cameraPointerIndex = pointerIndex;
-                    DeviceStatus.setCameraMovement("CAMERA_UP");
+                    DeviceStatus.setHeadMovement("UP");
                     pressedButton2View.setImageResource(R.drawable.camera_up);
                     break;
                 case 0X6c00ff:
                     cameraPointerIndex = pointerIndex;
-                    DeviceStatus.setCameraMovement("CAMERA_LEFT");
+                    DeviceStatus.setHeadMovement("LEFT");
                     pressedButton2View.setImageResource(R.drawable.camera_left);
                     break;
                 case 0X00fdff:
                     cameraPointerIndex = pointerIndex;
-                    DeviceStatus.setCameraMovement("CAMERA_RIGHT");
+                    DeviceStatus.setHeadMovement("RIGHT");
                     pressedButton2View.setImageResource(R.drawable.camera_right);
                     break;
                 case 0Xff0000:
                     cameraPointerIndex = pointerIndex;
-                    DeviceStatus.setCameraMovement("CAMERA_CENTER");
+                    DeviceStatus.setHeadMovement("CENTER");
                     pressedButton2View.setImageResource(R.drawable.camera_center);
                     break;
                 case 0Xd1ab7d:
                     cameraPointerIndex = pointerIndex;
-                    DeviceStatus.setCameraMovement("CAMERA_DOWN");
+                    DeviceStatus.setHeadMovement("DOWN");
                     pressedButton2View.setImageResource(R.drawable.camera_down);
                     break;
             }
@@ -249,12 +249,12 @@ public class MainActivity extends Activity implements ImageObserver {
         int pointerIndex = event.getActionIndex();
         if (pointerIndex == hexapodPointerIndex) {
             pressedButton1View.setImageResource(0x00000000);
-            DeviceStatus.setHexapodMovement("STAND_BY");
+            DeviceStatus.setBodyMovement("STAND_BY");
             hexapodPointerIndex = -1;
         }
         if (pointerIndex == cameraPointerIndex) {
             pressedButton2View.setImageResource(0x00000000);
-            DeviceStatus.setCameraMovement("STAND_BY");
+            DeviceStatus.setHeadMovement("STAND_BY");
             cameraPointerIndex = -1;
         }
     }
@@ -262,8 +262,8 @@ public class MainActivity extends Activity implements ImageObserver {
     private void allButtonsReleased() {
         pressedButton1View.setImageResource(0x00000000);
         pressedButton2View.setImageResource(0x00000000);
-        DeviceStatus.setHexapodMovement("STAND_BY");
-        DeviceStatus.setCameraMovement("STAND_BY");
+        DeviceStatus.setBodyMovement("STAND_BY");
+        DeviceStatus.setHeadMovement("STAND_BY");
         hexapodPointerIndex = -1;
         cameraPointerIndex = -1;
     }

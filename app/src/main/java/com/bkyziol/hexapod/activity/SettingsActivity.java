@@ -43,7 +43,7 @@ public class SettingsActivity extends Activity implements ImageObserver {
         SeekBar cameraSpeedBar;
         cameraSpeedBar = findViewById(R.id.cameraSpeedBar);
         cameraSpeedBar.setMax(getResources().getInteger(R.integer.max_camera_speed));
-        cameraSpeedBar.setProgress(DeviceStatus.getCameraSpeed() - 5);
+        cameraSpeedBar.setProgress(DeviceStatus.getHeadSpeed() - 5);
 
         SeekBar videoFPSBar;
         videoFPSBar = findViewById(R.id.videoFPSBar);
@@ -129,7 +129,7 @@ public class SettingsActivity extends Activity implements ImageObserver {
         cameraSpeedBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                DeviceStatus.setCameraSpeed(progress + 5);
+                DeviceStatus.setHeadSpeed(progress + 5);
             }
 
             @Override
@@ -139,7 +139,7 @@ public class SettingsActivity extends Activity implements ImageObserver {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                double percent = DeviceStatus.getCameraSpeed();
+                double percent = DeviceStatus.getHeadSpeed();
                 percent = percent / (getResources().getInteger(R.integer.max_camera_speed) + 5) * 100;
                 Toast toast = Toast.makeText(getApplicationContext(), "Prędkość kamery: " + (int) percent + "%", Toast.LENGTH_SHORT);
                 toast.show();

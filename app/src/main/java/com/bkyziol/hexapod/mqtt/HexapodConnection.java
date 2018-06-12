@@ -159,7 +159,7 @@ public final class HexapodConnection {
                         DeviceStatus.setStatusReportNeeded(true);
                         statusRequestTimestamp = System.currentTimeMillis();
                     }
-                    if (DeviceStatus.isHexapodMoving() || DeviceStatus.isCameraMoving() || DeviceStatus.isStatusReportNeeded()) {
+                    if (DeviceStatus.isHexapodMoving() || DeviceStatus.isHeadMoving() || DeviceStatus.isStatusReportNeeded()) {
                         System.out.println("command send");
                         String jsonMessage = DeviceStatus.commandJSON();
                         mqttManager.publishString(jsonMessage, resources.getString(R.string.command_topic), AWSIotMqttQos.QOS0);

@@ -5,13 +5,13 @@ import org.json.JSONObject;
 
 public class DeviceStatus {
 
-    private static boolean hexapodIsMoving = false;
-    private static boolean cameraIsMoving = false;
+    private static boolean bodyIsMoving = false;
+    private static boolean headIsMoving = false;
 
     private static boolean statusReportNeeded = true;
 
-    private static String hexapodMovement = "STAND_BY";
-    private static String cameraMovement = "STAND_BY";
+    private static String bodyMovement = "STAND_BY";
+    private static String headMovement = "STAND_BY";
     private static boolean sleepMode = true;
 
     private static boolean fastMode = false;
@@ -19,7 +19,7 @@ public class DeviceStatus {
     private static int speedSlow = 20;
 
     private static int strideLength = 70;
-    private static int cameraSpeed = 100;
+    private static int headSpeed = 50;
 
     private static boolean cameraEnabled = false;
     private static boolean faceDetectionEnabled = false;
@@ -28,11 +28,11 @@ public class DeviceStatus {
 
 
     public static boolean isHexapodMoving() {
-        return hexapodIsMoving;
+        return bodyIsMoving;
     }
 
-    public static boolean isCameraMoving() {
-        return cameraIsMoving;
+    public static boolean isHeadMoving() {
+        return headIsMoving;
     }
 
     public static boolean isStatusReportNeeded() {
@@ -43,22 +43,22 @@ public class DeviceStatus {
         DeviceStatus.statusReportNeeded = statusReportNeeded;
     }
 
-    public static String getHexapodMovement() {
-        return hexapodMovement;
+    public static String getBodyMovement() {
+        return bodyMovement;
     }
 
-    public static void setHexapodMovement(String hexapodMovement) {
-        DeviceStatus.hexapodMovement = hexapodMovement;
-        hexapodIsMoving = true;
+    public static void setBodyMovement(String bodyMovement) {
+        DeviceStatus.bodyMovement = bodyMovement;
+        bodyIsMoving = true;
     }
 
-    public static String getCameraMovement() {
-        return cameraMovement;
+    public static String getHeadMovement() {
+        return headMovement;
     }
 
-    public static void setCameraMovement(String cameraMovement) {
-        DeviceStatus.cameraMovement = cameraMovement;
-        cameraIsMoving = true;
+    public static void setHeadMovement(String headMovement) {
+        DeviceStatus.headMovement = headMovement;
+        headIsMoving = true;
     }
 
     public static boolean isSleepMode() {
@@ -93,7 +93,7 @@ public class DeviceStatus {
         DeviceStatus.speedSlow = speedSlow;
     }
 
-    private static int getHexapodSpeed() {
+    private static int getBodySpeed() {
         if (isFastMode()) {
             return speedFast;
         } else {
@@ -109,12 +109,12 @@ public class DeviceStatus {
         DeviceStatus.strideLength = strideLength;
     }
 
-    public static int getCameraSpeed() {
-        return cameraSpeed;
+    public static int getHeadSpeed() {
+        return headSpeed;
     }
 
-    public static void setCameraSpeed(int cameraSpeed) {
-        DeviceStatus.cameraSpeed = cameraSpeed;
+    public static void setHeadSpeed(int headSpeed) {
+        DeviceStatus.headSpeed = headSpeed;
     }
 
 
@@ -155,21 +155,21 @@ public class DeviceStatus {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("timestamp", System.currentTimeMillis());
-            jsonObject.put("hexapodMovement", hexapodMovement);
-            if (hexapodMovement.equals("STAND_BY")) {
-                hexapodIsMoving = false;
+            jsonObject.put("bodyMovement", bodyMovement);
+            if (bodyMovement.equals("STAND_BY")) {
+                bodyIsMoving = false;
             }
-            jsonObject.put("cameraMovement", cameraMovement);
-            if (cameraMovement.equals("STAND_BY")) {
-                cameraIsMoving = false;
+            jsonObject.put("headMovement", headMovement);
+            if (headMovement.equals("STAND_BY")) {
+                headIsMoving = false;
             }
             jsonObject.put("statusReportNeeded", statusReportNeeded);
             statusReportNeeded = false;
             jsonObject.put("cameraEnabled", cameraEnabled);
             jsonObject.put("faceDetectionEnabled", faceDetectionEnabled);
-            jsonObject.put("hexapodSpeed", getHexapodSpeed());
+            jsonObject.put("bodySpeed", getBodySpeed());
             jsonObject.put("strideLength", strideLength);
-            jsonObject.put("cameraSpeed", cameraSpeed);
+            jsonObject.put("headSpeed", headSpeed);
             jsonObject.put("videoQuality", videoQuality);
             jsonObject.put("videoFPS", videoFPS);
             return jsonObject.toString();
