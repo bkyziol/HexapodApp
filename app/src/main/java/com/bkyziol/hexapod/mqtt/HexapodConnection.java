@@ -114,13 +114,11 @@ public final class HexapodConnection {
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    activity.setHexapodStatusTextView(R.color.green, "Hexapod: connected");
                                     statusResponseExpirationTimestamp = System.currentTimeMillis() + 5000;
                                     try {
                                         String string = new String(data, "UTF-8");
                                         switch (string) {
-                                            case "OK":
-                                                activity.setHexapodStatusTextView(R.color.green, "Hexapod: connected");
-                                                break;
                                             case "ERROR":
                                                 activity.setHexapodStatusTextView(R.color.red, "Hexapod: ERROR");
                                                 break;
